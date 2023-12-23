@@ -13,8 +13,9 @@
 </form>
 <br/>
 <br/>
-<form th:method = "POST" th:action = "@{/}" th:object="${user}">
 
+<!--<form th:method = "POST" th:action = "@{/admin/new?roles={roles}(roles=${user.roles})}}" th:object="${user}">-->
+<form th:method = "POST" th:action = "@{/admin/new}" th:object="${user}">
         <label for="firstName"> Enter first name: </label>
         <input type="text" th:field="*{firstName}" id="firstName"/>
         <br/>
@@ -38,7 +39,7 @@
         <label for="roleSelect"> Enter role: </label>
         <select id="roleSelect"  th:field="*{roles}" multiple="multiple">
                 <option th:each="role:${modelRole}"
-                        th:value="${role}"
+                        th:value="${role.getId()}"
                         th:text="${role}">
                 </option>
         </select>

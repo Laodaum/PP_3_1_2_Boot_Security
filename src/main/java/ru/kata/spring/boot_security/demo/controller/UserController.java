@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import javax.annotation.PostConstruct;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,6 +43,7 @@ public class UserController {
         model.addAttribute( "allUsers", userService.listUsers() );
         return "admin";
     }
+
     @GetMapping( "/user")
     public String printUser(Authentication authentication, ModelMap model) {
         model.addAttribute( "user", (User) authentication.getPrincipal());
@@ -51,39 +51,44 @@ public class UserController {
     }
 
     @GetMapping("/admin/delete")
-    public String deleteUser(@RequestParam(name = "id") Long id, ModelMap model) {
+    public String deleteUser(@RequestParam(name = "id") Long id) {
         userService.removeUserById(id);
         return "redirect:/admin";
     }
+
     @GetMapping("/admin/new")
      public String newUser(@ModelAttribute("user") User user, ModelMap modelRole) {
         modelRole.addAttribute( "modelRole", roleService.rolesSet());
         return "/admin/addForm";
     }
 
-    @PostMapping()
+    @PostMapping("/admin/new")
     public String addUser(@ModelAttribute("user") User user) {
         Set<Role> roles = new HashSet<>();
         for (Role role : user.getRoles()) {
-            roles.add(roleService.findRole(role.getRole()));
-            user.setRoles(roles);
+            Long id = Long.parseLong(role.getRole());
+            roles.add(roleService.findRole(id));
         }
+        user.setRoles(roles);
         userService.add(user);
         return "redirect:/admin";
     }
+
     @GetMapping("/admin/change")
     public String changeUser(@RequestParam(name = "id") Long id, ModelMap model) {
         model.addAttribute("user", userService.findUser(id));
         model.addAttribute( "modelRole", roleService.rolesSet());
         return "/admin/changeForm";
     }
+
     @PostMapping("/admin/change")
     public String update( @ModelAttribute("user") User changedUser) {
         Set<Role> roles = new HashSet<>();
         for (Role role : changedUser.getRoles()) {
-            roles.add(roleService.findRole(role.getRole()));
-            changedUser.setRoles(roles);
+            Long id = Long.parseLong(role.getRole());
+            roles.add(roleService.findRole(id));
         }
+        changedUser.setRoles(roles);
         userService.update(changedUser);
         return "redirect:/admin";
     }

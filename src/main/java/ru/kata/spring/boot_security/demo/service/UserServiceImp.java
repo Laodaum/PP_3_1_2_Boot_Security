@@ -51,6 +51,9 @@ public class UserServiceImp implements UserService {
    @Transactional
    @Override
    public void update(User changedUser) {
+      if (userDao.findUser(changedUser.getId()).getId() != changedUser.getId()) {
+         changedUser.setPassword(passwordEncoder.encode(changedUser.getPassword()));
+      }
       userDao.update(changedUser);
    }
 

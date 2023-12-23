@@ -33,7 +33,7 @@
         <label for="roleSelect"> Enter role: </label>
         <select id="roleSelect"  th:field="*{roles}" multiple="multiple">
                 <option th:each="role:${modelRole}"
-                        th:value="${role}"
+                        th:value="${role.getId()}"
                         th:text="${role}">
                 </option>
         </select>
