@@ -1,6 +1,7 @@
 package ru.kata.spring.boot_security.demo.controller;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.service.RoleService;
@@ -8,12 +9,11 @@ import ru.kata.spring.boot_security.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -78,17 +78,16 @@ public class UserController {
     public String changeUser(@RequestParam(name = "id") Long id, ModelMap model) {
         model.addAttribute("user", userService.findUser(id));
         model.addAttribute( "modelRole", roleService.rolesSet());
+        model.addAttribute( "id", id);
+        model.addAttribute( "roleSelect", new ArrayList<Long>());
         return "/admin/changeForm";
     }
 
-    @PostMapping("/admin/change")
-    public String update( @ModelAttribute("user") User changedUser) {
-        Set<Role> roles = new HashSet<>();
-        for (Role role : changedUser.getRoles()) {
-            Long id = Long.parseLong(role.getRole());
-            roles.add(roleService.findRole(id));
+    @PatchMapping("/admin/change")
+    public String update(@RequestParam (required = false) List<Long> roleSelectedID, @ModelAttribute("user") User changedUser) {
+        for(Long roleIdFromFront: roleSelectedID){
+            changedUser.setRoles(roleService.findRole(roleIdFromFront));
         }
-        changedUser.setRoles(roles);
         userService.update(changedUser);
         return "redirect:/admin";
     }
